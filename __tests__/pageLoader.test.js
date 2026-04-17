@@ -82,3 +82,47 @@ test('maneja páginas sin imágenes', async () => {
 
   expect(content).toContain('<h1>Hello</h1>');
 });
+
+test('descarga de recursos locales y modifica HTML', async () => {
+  const url = 'https://codica.la/cursos';
+
+  const html = await readFixture('pageWithResources.html');
+
+  nock('https://codica.la')
+    .get('/cursos')
+    .reply(200, html);
+
+  nock('https://codica.la')
+    .get('/assets/test.png')
+    .reply(200, 'image-data');
+
+    nock('https://codica.la')
+    .get('/assets/application.css')
+    .reply(200, 'css-data');
+
+   nock('https://codica.la')
+    .get('/packs/app.js')
+    .reply(200, 'js-data');
+    
+  const filePath = await pageLoader(url, tempDir);
+
+  const content = await fs.readFile(filePath, 'utf-8');
+
+  expect(content).toContain('_files/');
+  expect(content).toContain('.png');
+  expect(content).toContain('.css');
+  expect(content).toContain('.js');
+
+  const files = await fs.readdir(tempDir);
+
+  const resourcesDir = files.find((file) => file.includes('_files'));
+
+  expect(resourcesDir).toBeTruthy();
+
+  const dirPath = path.join(tempDir, resourcesDir);
+   
+  const resources = await fs.readdir(dirPath);
+
+  expect(resources.length).toBe(3);
+
+});

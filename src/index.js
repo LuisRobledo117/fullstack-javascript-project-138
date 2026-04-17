@@ -2,7 +2,7 @@ import axios from "axios";
 import fs from 'fs/promises';
 import path from 'path';
 import * as cheerio from 'cheerio';
-import { dir } from "console";
+import { get } from "http";
 
 export const getFileName = (url) => {
   return url
@@ -11,39 +11,50 @@ export const getFileName = (url) => {
     + '.html';
 };
 
-const processImages =(html, url, outputDir) => {
+const processResources =(html, url, outputDir) => {
   const $ = cheerio.load(html);
 
   const dirName = getFileName(url).replace('.html', '_files');
   const dirPath = path.join(outputDir, dirName);
 
-  const images = $('img');
+  const elements = [
+    ...$('img').toArray(),
+    ...$('link').toArray(),
+    ...$('script').toArray(),
+  ];
 
   return fs.mkdir(dirPath, { recursive: true })
     .then(() => {
-      const promises = [];
+      const promises = elements.map((element) => {
+        const tag = element.name;
 
-      images.each((i, element) => {
-        const src = $(element).attr('src');
+        if (tag === 'link' && $(element).attr('rel') !== 'stylesheet') {
+          return null;
+        }
 
-        if (!src) return;
+        const attr = tag === 'link' ? 'href' : 'src';
+        const value = $(element).attr(attr);
+        
+        if(!value) return null;
 
-        const imageUrl = new URL(src, url).href;
+        const resourceUrl = new URL(value, url).href;
 
-        const imageName = getFileName(imageUrl).replace('.html', '.png');
+        const isLocal = new URL(resourceUrl).hostname === new URL(url).hostname;
 
-        const filePath = path.join(dirPath, imageName);
+        if (!isLocal) return null;
 
-        const promise = axios.get(imageUrl, { responseType: 'arraybuffer' })
+        const ext = path.extname(resourceUrl);
+        const fileName = getFileName(resourceUrl).replace('.html', ext);
+        const filePath = path.join(dirPath, fileName);
+
+        return axios.get(resourceUrl, { responseType: 'arraybuffer' })
           .then((response) => fs.writeFile(filePath, response.data))
           .then(() => {
-            $(element).attr('src', `${dirName}/${imageName}`);
+            $(element).attr(attr, `${dirName}/${fileName}`);
           });
-
-        promises.push(promise);
       });
 
-      return Promise.all(promises).then(() => $.html());
+      return Promise.all(promises.filter(Boolean)).then(() => $.html());
     });
 };
 
@@ -56,7 +67,7 @@ const pageLoader = (url, outputDir = process.cwd()) => {
     .then((response) => {
       const html = response.data;
       
-      return processImages(html, url, outputDir);
+      return processResources(html, url, outputDir);
     }).then((processedHtml) => { return fs.writeFile(filePath, processedHtml);
 
     }).then(() => filePath);

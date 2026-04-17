@@ -77,3 +77,6 @@ Las pruebas utilizan mocking de HTTP para simular descargas sin depender de inte
 ✔ Guardado de archivos
 ✔ CLI funcional
 ✔ Tests implementados
+
+Prueba descarga de imagenes y modificacion del html:
+ https://asciinema.org/a/uVZAhoTMyxbLcJX5
