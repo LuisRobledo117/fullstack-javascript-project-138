@@ -80,3 +80,9 @@ Las pruebas utilizan mocking de HTTP para simular descargas sin depender de inte
 
 Prueba descarga de imagenes y modificacion del html:
  https://asciinema.org/a/uVZAhoTMyxbLcJX5
+
+prueba paso 3 descarga de otros recuros .png .css y .js
+https://asciinema.org/a/NdbWu4DUqyxPnop9
+
+prueba debug asciinema:
+https://asciinema.org/a/sHJtSai94VvvfZjl
