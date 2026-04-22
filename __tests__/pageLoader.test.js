@@ -14,10 +14,10 @@ afterEach(() => {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const getFixturePath = (filename) => 
+const getFixturePath = (filename) =>
   path.join(__dirname, '__fixture__', filename);
 
-const readFixture = (filename) => 
+const readFixture = (filename) =>
   fs.readFile(getFixturePath(filename), 'utf8');
 
 let tempDir;
@@ -101,14 +101,14 @@ test('descarga de recursos locales y modifica HTML', async () => {
     .get('/assets/test.png')
     .reply(200, 'image-data');
 
-    nock('https://codica.la')
+  nock('https://codica.la')
     .get('/assets/application.css')
     .reply(200, 'css-data');
 
-   nock('https://codica.la')
+  nock('https://codica.la')
     .get('/packs/app.js')
     .reply(200, 'js-data');
-    
+
   const filePath = await pageLoader(url, tempDir);
 
   const content = await fs.readFile(filePath, 'utf-8');
@@ -125,7 +125,7 @@ test('descarga de recursos locales y modifica HTML', async () => {
   expect(resourcesDir).toBeTruthy();
 
   const dirPath = path.join(tempDir, resourcesDir);
-   
+
   const resources = await fs.readdir(dirPath);
 
   expect(resources.length).toBe(3);

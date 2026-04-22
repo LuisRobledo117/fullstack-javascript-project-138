@@ -11,6 +11,7 @@ export default [
       globals: globals.browser,
       ecmaVersion: 2021,
       sourceType: 'module',
+      node: true,
     },
     rules: {
       ...js.configs.recommended.rules,

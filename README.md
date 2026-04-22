@@ -3,7 +3,13 @@
 
 # Page Loader
 
-Page Loader es una utilidad de línea de comandos (CLI) que descarga una página web y la guarda como archivo HTML en el sistema local.
+es una utilidad de línea de comandos que descarga páginas web y sus recursos locales (imágenes, CSS y JavaScript) para permitir su visualización offline.
+
+El programa:
+- Descarga el HTML de una página
+- Guarda los recursos locales en una carpeta
+- Reemplaza las rutas en el HTML
+- Muestra el progreso de descarga en la terminal
 
 ## Instalación
 
@@ -33,9 +39,13 @@ page-loader [options] <url>
 
 page-loader https://example.com
 
-Salida:
+Descarga de página:
 
-/ruta/completa/example-com.html
+🔹 Descarga con recursos (imágenes, CSS, JS)
+
+🔹 Progreso de descarga (Listr)
+
+🔹 Manejo de errores
 
 También puedes especificar un directorio:
 
@@ -43,21 +53,49 @@ page-loader https://example.com -o ./pages
 
 ---
 
-## ⚙️ Cómo funciona
+## Cómo funciona
 
-1. Recibe una URL desde la línea de comandos
-2. Descarga el contenido HTML usando solicitudes HTTP
-3. Genera un nombre de archivo basado en la URL
-4. Guarda el archivo en el directorio especificado
+1. Se descarga el HTML de la página
+2. Se analizan los recursos con Cheerio
+3. Se filtran solo recursos locales
+4. Se descargan en paralelo
+5. Se actualizan las rutas en el HTML
+6. Se guarda el archivo final
 
 ---
 
+## Manejo de errores
+
+El programa:
+
+- Muestra errores en stderr
+- Finaliza con código de salida distinto de 0
+- Maneja fallos de red y escritura
+- Continúa si falla la descarga de un recurso individual
+
 ## Ejemplo de transformación de URL
 
-https://codica.la/cursos → codica-la-cursos.html
- # Ejemplo en asciinema
+ https://codica.la/cursos → codica-la-cursos.html
 
- https://asciinema.org/a/zmgE9vpWJJ4SfcGQ
+Ejemplos con asciinema:
+
+* Transformacion de URL:
+  https://asciinema.org/a/zmgE9vpWJJ4SfcGQ
+
+* Prueba descarga de imagenes y modificacion del html:
+  https://asciinema.org/a/uVZAhoTMyxbLcJX5
+
+* prueba paso 3 descarga de otros recuros .png .css y .js
+  https://asciinema.org/a/NdbWu4DUqyxPnop9
+
+* prueba debug asciinema:
+  https://asciinema.org/a/sHJtSai94VvvfZjl
+
+* manejo de errores:
+  https://asciinema.org/a/OrSkq8GUbNfLkGC4
+
+* Ejemplo con spinner:
+  https://asciinema.org/a/6s18AzxciyeUsuxz
 
 ---
 
@@ -71,23 +109,24 @@ Las pruebas utilizan mocking de HTTP para simular descargas sin depender de inte
 
 ---
 
-## Estado del proyecto
+## Tecnologías utilizadas
 
-✔ Descarga de páginas
-✔ Guardado de archivos
-✔ CLI funcional
-✔ Tests implementados
+- Node.js
+- Axios
+- Cheerio
+- Listr2
+- Jest
+- Nock
+- Debug
 
-ejemplos:
+## Estructura del proyecto
 
-Prueba descarga de imagenes y modificacion del html:
- https://asciinema.org/a/uVZAhoTMyxbLcJX5
+src/
+  index.js
+bin/
+  page-loader.js
+__tests__/
+  pageLoader.test.js
 
-prueba paso 3 descarga de otros recuros .png .css y .js
-https://asciinema.org/a/NdbWu4DUqyxPnop9
-
-prueba debug asciinema:
-https://asciinema.org/a/sHJtSai94VvvfZjl
-
-manejo de errores:
-https://asciinema.org/a/OrSkq8GUbNfLkGC4
+## Autor
+Luis Robledo
