@@ -78,6 +78,8 @@ Las pruebas utilizan mocking de HTTP para simular descargas sin depender de inte
 ✔ CLI funcional
 ✔ Tests implementados
 
+ejemplos:
+
 Prueba descarga de imagenes y modificacion del html:
  https://asciinema.org/a/uVZAhoTMyxbLcJX5
 
@@ -86,3 +88,6 @@ https://asciinema.org/a/NdbWu4DUqyxPnop9
 
 prueba debug asciinema:
 https://asciinema.org/a/sHJtSai94VvvfZjl
+
+manejo de errores:
+https://asciinema.org/a/OrSkq8GUbNfLkGC4

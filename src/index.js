@@ -105,6 +105,8 @@ const pageLoader = (url, outputDir = process.cwd()) => {
       log(`Archivo guardado en: ${filePath}`);
 
       return filePath
+    }).catch((error) => {
+      throw new Error(`Error: ${error.message}`);
     });
 };
 

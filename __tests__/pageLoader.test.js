@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import fs from 'fs/promises';
 import os from 'os';
 import path from 'path';
@@ -5,6 +6,10 @@ import nock from 'nock';
 import pageLoader from '../src/index.js';
 import { getFileName } from '../src/index.js';
 import { fileURLToPath } from 'url';
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -125,4 +130,40 @@ test('descarga de recursos locales y modifica HTML', async () => {
 
   expect(resources.length).toBe(3);
 
+});
+
+test('maneja error de red', async () => {
+  const url = 'https://codica.la/cursos';
+
+  nock('https://codica.la')
+    .get('/cursos')
+    .replyWithError('Network error');
+
+  await expect(pageLoader(url, tempDir))
+    .rejects.toThrow('Error: Network error');
+});
+
+test('maneja error 404', async () => {
+  const url = 'https://codica.la/cursos';
+
+  nock('https://codica.la')
+    .get('/cursos')
+    .reply(404);
+
+  await expect(pageLoader(url, tempDir))
+    .rejects.toThrow();
+});
+
+test('maneja error de escritura', async () => {
+  const url = 'https://codica.la/cursos';
+
+  nock('https://codica.la')
+    .get('/cursos')
+    .reply(200, '<html></html>');
+
+  jest.spyOn(fs, 'writeFile')
+    .mockRejectedValue(new Error('Permission denied'));
+
+  await expect(pageLoader(url, '__fixtures__'))
+    .rejects.toThrow('Permission denied');
 });
