@@ -92,7 +92,7 @@ const pageLoader = (url, outputDir = process.cwd()) => {
   const fileName = getFileName(url);
   const filePath = path.join(outputDir, fileName);
 
-  return fs.mkdir(outputDir, { recursive: true })
+  return fs.access(outputDir)
     .then(() => {
       log(`Directorio de salida: ${outputDir}`);
       return axios.get(url);
