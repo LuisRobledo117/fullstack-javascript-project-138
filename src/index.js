@@ -34,10 +34,6 @@ const processResources = (html, url, outputDir) => {
       const tasks = elements.map((element) => {
         const tag = element.name;
 
-        if (tag === 'link' && $(element).attr('rel') !== 'stylesheet') {
-          return null;
-        }
-
         const attr = tag === 'link' ? 'href' : 'src';
         const value = $(element).attr(attr);
 
@@ -53,7 +49,7 @@ const processResources = (html, url, outputDir) => {
         if (!isLocal) return null;
 
         const cleanUrl = resourceUrl.split('?')[0];
-        const ext = path.extname(cleanUrl);
+        const ext = path.extname(cleanUrl) || '.html';
         const fileName = getFileName(cleanUrl).replace('.html', ext);
         const filePath = path.join(dirPath, fileName);
 
