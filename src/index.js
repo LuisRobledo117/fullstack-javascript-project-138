@@ -14,6 +14,19 @@ export const getFileName = (url) => {
     + '.html';
 };
 
+const getResourceName = (resourceUrl, pageUrl) => {
+  const pageName = getFileName(pageUrl).replace('.html', '');
+
+  const urlObj = new URL(resourceUrl);
+  const ext = path.extname(urlObj.pathname) || '.html';
+
+  const resourcePath = urlObj.pathname
+    .replace(/^\/+/, '')
+    .replace(/[^a-zA-Z0-9]/g, '-');
+
+  return `${pageName}-${resourcePath}${ext}`;
+};
+
 const processResources = (html, url, outputDir) => {
   const $ = cheerio.load(html);
 
@@ -48,9 +61,7 @@ const processResources = (html, url, outputDir) => {
 
         if (!isLocal) return null;
 
-        const cleanUrl = resourceUrl.split('?')[0];
-        const ext = path.extname(cleanUrl) || '.html';
-        const fileName = getFileName(cleanUrl).replace('.html', ext);
+        const fileName = getResourceName(resourceUrl, url);
         const filePath = path.join(dirPath, fileName);
 
         return {
