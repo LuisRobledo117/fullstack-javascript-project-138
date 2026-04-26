@@ -20,11 +20,17 @@ const getResourceName = (resourceUrl, pageUrl) => {
   const urlObj = new URL(resourceUrl);
   const ext = path.extname(urlObj.pathname) || '.html';
 
-  const resourcePath = urlObj.pathname
+  const resourcePath = path.basename(urlObj.pathname, ext);
+
+  const resourceDir = path.dirname(urlObj.pathname)
     .replace(/^\/+/, '')
     .replace(/[^a-zA-Z0-9]/g, '-');
 
-  return `${pageName}-${resourcePath}${ext}`;
+  const normalizedName = [resourceDir, resourcePath]
+    .filter(Boolean)
+    .join('-');
+
+  return `${pageName}-${normalizedName}${ext}`;
 };
 
 const processResources = (html, url, outputDir) => {
@@ -33,7 +39,7 @@ const processResources = (html, url, outputDir) => {
   const dirName = getFileName(url).replace('.html', '_files');
   const dirPath = path.join(outputDir, dirName);
 
-  const baseHost = new URL(url).hostname;
+  const baseOrigin = new URL(url).origin;
 
   const elements = [
     ...$('img').toArray(),
@@ -53,11 +59,9 @@ const processResources = (html, url, outputDir) => {
         if (!value) return null;
 
         const resourceUrl = new URL(value, url).href;
-        const resourceHost = new URL(resourceUrl).hostname;
+        const resourceOrigin = new URL(resourceUrl).origin;
 
-        const isLocal =
-          resourceHost === baseHost ||
-          resourceHost.endsWith(`.${baseHost}`);
+        const isLocal = resourceOrigin === baseOrigin;
 
         if (!isLocal) return null;
 
